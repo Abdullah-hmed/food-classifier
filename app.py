@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+import requests, os, json
 import torch
 import torchvision.transforms as transforms
 import torch.nn as nn
@@ -38,10 +39,50 @@ def predict():
         
         if image_file:
             image = Image.open(image_file)
-            image_class, confidence = classification(image)
-            data = f'class: {image_class}, confidence: {confidence:.2f}'
+            food_name, confidence = classification(image)
+            nutrition_facts = get_usda_nutrition(food_name)
+            nutrition_output = f"Description:{nutrition_facts['description']} <br> Calories: {nutrition_facts['calories']} <br> Protein: {nutrition_facts['protein']} <br> Fat: {nutrition_facts['fat']} <br> Carbs: {nutrition_facts['carbs']}"
+            data = f'class: {food_name}, confidence: {confidence:.2f} <br> {nutrition_output}'
+            print(data)
             return data
     
+
+def get_usda_nutrition(food_name):
+    api_key = os.getenv("USDA_API_KEY")
+    api_url = f"https://api.nal.usda.gov/fdc/v1/foods/search?query={food_name}&api_key={api_key}&pageSize=1"
+    
+    try:
+        response = requests.get(api_url)
+        response.raise_for_status() 
+        data = response.json()
+        
+        if 'foods' in data and len(data['foods']) > 0:
+            food = data['foods'][0]  # Get the first food result
+            food_nutrients = food.get("foodNutrients", [])
+            
+            calories = protein = fat = carbs = "N/A"
+            
+            for nutrient in food_nutrients:
+                if nutrient.get("nutrientName") == "Energy":
+                    calories = nutrient.get("value", "N/A")
+                elif nutrient.get("nutrientName") == "Protein":
+                    protein = nutrient.get("value", "N/A")
+                elif nutrient.get("nutrientName") == "Total lipid (fat)":
+                    fat = nutrient.get("value", "N/A")
+                elif nutrient.get("nutrientName") == "Carbohydrate, by difference":
+                    carbs = nutrient.get("value", "N/A")
+            
+            return {
+                "description": food.get("description", "N/A"),
+                "calories": calories,
+                "protein": protein,
+                "fat": fat,
+                "carbs": carbs
+            }
+        else:
+            return {"error": "Food not found"}
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e)}
 
 
 def classification(image):
