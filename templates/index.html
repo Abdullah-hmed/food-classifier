@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
+    <title>Food Classifier</title>
+    <style>
+        body{
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+    <h1>Food Classifier</h1>
+    <img id="img" src="https://www.placeholder.com/500" width="500" height="500" alt="Selected Image">
+    <form id="form" hx-post="/predict" hx-target="#result" hx-encoding="multipart/form-data">
+        <input type="file" name="image" id="upload" accept="image/*">
+        <input type="submit" value="Classify Food">
+    </form>
+    <div id="result"></div>
+</body>
+<script>
+    const uploadButton = document.getElementById('upload');
+    const image = document.getElementById('img');
+
+    uploadButton.addEventListener('change', (event)=>{
+        const file = event.target.files[0];
+        if(file){
+            image.src = URL.createObjectURL(file);
+        }
+    });
+</script>
+</html>
