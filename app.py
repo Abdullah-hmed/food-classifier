@@ -41,10 +41,11 @@ def predict():
             image = Image.open(image_file)
             food_name, confidence = classification(image)
             nutrition_facts = get_usda_nutrition(food_name)
-            nutrition_output = f"Description:{nutrition_facts['description']} <br> Calories: {nutrition_facts['calories']} <br> Protein: {nutrition_facts['protein']} <br> Fat: {nutrition_facts['fat']} <br> Carbs: {nutrition_facts['carbs']}"
-            data = f'class: {food_name}, confidence: {confidence:.2f} <br> {nutrition_output}'
-            print(data)
-            return data
+            nutrition_facts['query'] = food_name
+            nutrition_facts['confidence'] = confidence
+            
+            print(nutrition_facts)
+            return nutrition_facts
     
 
 def get_usda_nutrition(food_name):

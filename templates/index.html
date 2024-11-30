@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/htmx.org@2.0.3"></script>
     <title>Food Classifier</title>
     <style>
         body{
@@ -18,9 +17,9 @@
 <body>
     <h1>Food Classifier</h1>
     <img id="img" src="https://www.placeholder.com/500" width="500" height="500" alt="Selected Image">
-    <form id="form" hx-post="/predict" hx-target="#result" hx-encoding="multipart/form-data">
+    <form id="form">
         <input type="file" name="image" id="upload" accept="image/*">
-        <input type="submit" value="Classify Food">
+        <input id="submit" type="submit" value="Classify Food">
     </form>
     <div id="result"></div>
 </body>
@@ -34,5 +33,36 @@
             image.src = URL.createObjectURL(file);
         }
     });
+
+    const submitButton = document.getElementById('submit');
+    const resultDiv = document.getElementById('result');
+
+    submitButton.addEventListener('click', (event)=>{
+        event.preventDefault();
+        getData();
+    });
+
+    async function getData() {
+        const url = '/predict';
+        const formData = new FormData();
+        formData.append('image', uploadButton.files[0]);
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if(!response.ok) {
+                console.log("not working");
+            }
+
+            const data = await response.json();
+            console.log(data);
+            resultDiv.innerHTML = `Description: ${data.description}<br>Calories: ${data.calories}<br>Protein: ${data.protein}<br>Fat: ${data.fat}<br>Carbs: ${data.carbs}`
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
 </script>
 </html>
