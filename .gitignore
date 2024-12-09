@@ -163,6 +163,5 @@ cython_debug/
 
 *.ipynb
 
-model/
 old_model/
 *.pth
