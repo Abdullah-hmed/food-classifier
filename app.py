@@ -5,6 +5,7 @@ import torchvision.transforms as transforms
 import torch.nn as nn
 from torchvision import models
 import io
+import gdown
 from PIL import Image
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -13,9 +14,9 @@ class_names = io.open('labels.txt', 'r').read().split('\n')
 
 
 def model_available():
-    models_dir = 'models'
-    model_file = 'self_dataset_model_1.pth'
-    drive_link = 'https://drive.google.com/uc?export=download&id=18yHJEYpNH7BF5mIF-kqiQteW_xqu7sVj'
+    models_dir = 'model'
+    model_file = 'improved_best_model.pth'
+    drive_link = 'https://drive.google.com/uc?export=download&id=1mFLtnUbKCMJpULPvurGoE1jix3U__eaM'
 
     # Ensure the models directory exists
     if not os.path.exists(models_dir):
