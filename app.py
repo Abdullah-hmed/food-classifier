@@ -9,7 +9,41 @@ from PIL import Image
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 app = Flask(__name__)
-class_names = io.open('model/labels.txt', 'r').read().split('\n')
+class_names = io.open('labels.txt', 'r').read().split('\n')
+
+
+def model_available():
+    models_dir = 'models'
+    model_file = 'self_dataset_model_1.pth'
+    drive_link = 'https://drive.google.com/uc?export=download&id=18yHJEYpNH7BF5mIF-kqiQteW_xqu7sVj'
+
+    # Ensure the models directory exists
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir)
+
+    # Check if the model file exists
+    model_path = os.path.join(models_dir, model_file)
+    if os.path.exists(model_path):
+        print("Model present, continue :)")
+        return True
+    else:
+        print("Model not present, downloading...")
+
+        try:
+            gdown.download(drive_link, model_path, quiet=False)
+            print(f"{model_file} downloaded and saved to {models_dir} folder.")
+            return True
+        except Exception as e:
+            print(f"Failed to download {model_file} from Google Drive. Error: {str(e)}")
+            return False
+
+
+if  model_available():
+    print("Model Loaded, Continuing.")
+else:
+    print("Exiting the application: Model Not Available.")
+    exit(1)
+
 
 def setup_model():
     torch.cuda.empty_cache()    
