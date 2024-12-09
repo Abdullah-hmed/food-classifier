@@ -14,7 +14,6 @@ class_names = io.open('model/labels.txt', 'r').read().split('\n')
 def setup_model():
     torch.cuda.empty_cache()    
     model = models.inception_v3(pretrained=True)
-    # Keep auxiliary classifier
     num_classes = 101
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, num_classes)
@@ -24,7 +23,7 @@ def setup_model():
 
 model = setup_model()
 # Load the checkpoint
-checkpoint = torch.load('model/best_model.pth')
+checkpoint = torch.load('model/improved_best_model.pth', weights_only=True)
 # Restore model state
 model.load_state_dict(checkpoint['model_state_dict'])
 
@@ -43,7 +42,7 @@ def predict():
             nutrition_facts = get_usda_nutrition(food_name)
             nutrition_facts['query'] = food_name
             nutrition_facts['confidence'] = confidence
-            
+            print(food_name,':', confidence)
             print(nutrition_facts)
             return nutrition_facts
     
