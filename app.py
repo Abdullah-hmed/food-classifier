@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
 import requests, os, json
 import torch
 import torchvision.transforms as transforms
@@ -9,8 +10,10 @@ import gdown
 from PIL import Image
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-app = Flask(__name__)
 class_names = io.open('labels.txt', 'r').read().split('\n')
+
+app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]}})
 
 
 def model_available():
